@@ -1,0 +1,926 @@
+{
+  "contractName": "Escrow",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner1",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "owner2",
+          "type": "address"
+        }
+      ],
+      "name": "createBaskets",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "agree",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "viewBaskets",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"agree\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner1\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"owner2\",\"type\":\"address\"}],\"name\":\"createBaskets\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"}],\"name\":\"deposit\",\"outputs\":[],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"viewBaskets\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Escrow.sol\":\"Escrow\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Escrow.sol\":{\"keccak256\":\"0x7f85228bfa3a384d4ca1679f7454c79fecf5d275f14fa0072305f14ad9595f7d\",\"urls\":[\"bzz-raw://9165d32ea1c887302f79a10acf1ca75b6e21d032624144220723cda67639ca72\",\"dweb:/ipfs/QmUa5CsebQXxeMxoTXKiewHbP219nbNEKgwu6c1tCyMysW\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061018b806100206000396000f3fe60806040526004361061004a5760003560e01c806312fe2bee1461004f5780633ccfd60b146100c05780638f9d5882146100d75780638fae60a5146100ee578063f340fa0114610105575b600080fd5b34801561005b57600080fd5b506100be6004803603604081101561007257600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610149565b005b3480156100cc57600080fd5b506100d561014d565b005b3480156100e357600080fd5b506100ec61014f565b005b3480156100fa57600080fd5b50610103610151565b005b6101476004803603602081101561011b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610153565b005b5050565b565b565b565b5056fea265627a7a723158200f3a46161f3340897c70fce72442237442161800a9c57010f2799de11ffc53ab64736f6c63430005100032",
+  "deployedBytecode": "0x60806040526004361061004a5760003560e01c806312fe2bee1461004f5780633ccfd60b146100c05780638f9d5882146100d75780638fae60a5146100ee578063f340fa0114610105575b600080fd5b34801561005b57600080fd5b506100be6004803603604081101561007257600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610149565b005b3480156100cc57600080fd5b506100d561014d565b005b3480156100e357600080fd5b506100ec61014f565b005b3480156100fa57600080fd5b50610103610151565b005b6101476004803603602081101561011b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610153565b005b5050565b565b565b565b5056fea265627a7a723158200f3a46161f3340897c70fce72442237442161800a9c57010f2799de11ffc53ab64736f6c63430005100032",
+  "sourceMap": "66:1127:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;66:1127:0;;;;;;;",
+  "deployedSourceMap": "66:1127:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;178:102;;8:9:-1;5:2;;;30:1;27;20:12;5:2;178:102:0;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;178:102:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;541:185;;8:9:-1;5:2;;;30:1;27;20:12;5:2;541:185:0;;;:::i;:::-;;925:186;;8:9:-1;5:2;;;30:1;27;20:12;5:2;925:186:0;;;:::i;:::-;;730:191;;8:9:-1;5:2;;;30:1;27;20:12;5:2;730:191:0;;;:::i;:::-;;284:253;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;284:253:0;;;;;;;;;;;;;;;;;;;:::i;:::-;;178:102;;;:::o;541:185::-;:::o;925:186::-;:::o;730:191::-;:::o;284:253::-;;:::o",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.4.22 <0.9.0;\n\ncontract Escrow {\n\n  modifier isBasketOwner() {\n    // check if msg.sende owns one of the baskest\n    _;\n  }\n\n  function createBaskets(address owner1, address owner2) public {\n    // make baskets for 2 parties\n\n  }\n\n  function deposit(address token) public payable {\n    // check if msg.sender owns one of the baskets\n    // check if token is actually owned by sender?\n    // if yes, invalidate previous agreements and\n    // transfer token to the coresponding basket\n  }\n\n  function withdraw() public {\n    // check if msg.sender owns one of the baskets\n    // if yes, invalidate previous agreements and\n    // return all tokens that are in senders basket\n  }\n\n  function agree() public {\n    // check if msg.sender owns one of the baskets\n    // log agreement\n    // if both basket owners are currently agreeing:\n    // -> start basket swap routine \n  }\n\n  function viewBaskets() public view {\n    // check if msg sender is one of the owner? (useless, every body can view internal state)\n    // show content of both baskets (in a nice way)\n  }\n\n  function swapBaskets() internal {\n    // swap routine, internal function\n  }\n}\n",
+  "sourcePath": "/Users/mareike/ConsenSys/blockchain-developer-bootcamp-final-project/contracts/Escrow.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Escrow.sol",
+    "exportedSymbols": {
+      "Escrow": [
+        36
+      ]
+    },
+    "id": 37,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".22",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:32:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 36,
+        "linearizedBaseContracts": [
+          36
+        ],
+        "name": "Escrow",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 4,
+              "nodeType": "Block",
+              "src": "112:62:0",
+              "statements": [
+                {
+                  "id": 3,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "168:1:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 5,
+            "name": "isBasketOwner",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 2,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "109:2:0"
+            },
+            "src": "87:87:0",
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 12,
+              "nodeType": "Block",
+              "src": "240:40:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 13,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createBaskets",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7,
+                  "name": "owner1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13,
+                  "src": "201:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "201:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9,
+                  "name": "owner2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13,
+                  "src": "217:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "217:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "200:32:0"
+            },
+            "returnParameters": {
+              "id": 11,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "240:0:0"
+            },
+            "scope": 36,
+            "src": "178:102:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 18,
+              "nodeType": "Block",
+              "src": "331:206:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 19,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 16,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 15,
+                  "name": "token",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 19,
+                  "src": "301:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "301:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "300:15:0"
+            },
+            "returnParameters": {
+              "id": 17,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "331:0:0"
+            },
+            "scope": 36,
+            "src": "284:253:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 22,
+              "nodeType": "Block",
+              "src": "568:158:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 23,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdraw",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 20,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "558:2:0"
+            },
+            "returnParameters": {
+              "id": 21,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "568:0:0"
+            },
+            "scope": 36,
+            "src": "541:185:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 26,
+              "nodeType": "Block",
+              "src": "754:167:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 27,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "agree",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "744:2:0"
+            },
+            "returnParameters": {
+              "id": 25,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "754:0:0"
+            },
+            "scope": 36,
+            "src": "730:191:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 30,
+              "nodeType": "Block",
+              "src": "960:151:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 31,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "viewBaskets",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 28,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "945:2:0"
+            },
+            "returnParameters": {
+              "id": 29,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "960:0:0"
+            },
+            "scope": 36,
+            "src": "925:186:0",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 34,
+              "nodeType": "Block",
+              "src": "1147:44:0",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 35,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "swapBaskets",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1135:2:0"
+            },
+            "returnParameters": {
+              "id": 33,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1147:0:0"
+            },
+            "scope": 36,
+            "src": "1115:76:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 37,
+        "src": "66:1127:0"
+      }
+    ],
+    "src": "32:1162:0"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "project:/contracts/Escrow.sol",
+      "exportedSymbols": {
+        "Escrow": [
+          36
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.4",
+            ".22",
+            "<",
+            "0.9",
+            ".0"
+          ]
+        },
+        "id": 1,
+        "name": "PragmaDirective",
+        "src": "32:32:0"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            36
+          ],
+          "name": "Escrow",
+          "scope": 37
+        },
+        "children": [
+          {
+            "attributes": {
+              "documentation": null,
+              "name": "isBasketOwner",
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2,
+                "name": "ParameterList",
+                "src": "109:2:0"
+              },
+              {
+                "children": [
+                  {
+                    "id": 3,
+                    "name": "PlaceholderStatement",
+                    "src": "168:1:0"
+                  }
+                ],
+                "id": 4,
+                "name": "Block",
+                "src": "112:62:0"
+              }
+            ],
+            "id": 5,
+            "name": "ModifierDefinition",
+            "src": "87:87:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "createBaskets",
+              "scope": 36,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner1",
+                      "scope": 13,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 6,
+                        "name": "ElementaryTypeName",
+                        "src": "201:7:0"
+                      }
+                    ],
+                    "id": 7,
+                    "name": "VariableDeclaration",
+                    "src": "201:14:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner2",
+                      "scope": 13,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8,
+                        "name": "ElementaryTypeName",
+                        "src": "217:7:0"
+                      }
+                    ],
+                    "id": 9,
+                    "name": "VariableDeclaration",
+                    "src": "217:14:0"
+                  }
+                ],
+                "id": 10,
+                "name": "ParameterList",
+                "src": "200:32:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 11,
+                "name": "ParameterList",
+                "src": "240:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12,
+                "name": "Block",
+                "src": "240:40:0"
+              }
+            ],
+            "id": 13,
+            "name": "FunctionDefinition",
+            "src": "178:102:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "deposit",
+              "scope": 36,
+              "stateMutability": "payable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "token",
+                      "scope": 19,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 14,
+                        "name": "ElementaryTypeName",
+                        "src": "301:7:0"
+                      }
+                    ],
+                    "id": 15,
+                    "name": "VariableDeclaration",
+                    "src": "301:13:0"
+                  }
+                ],
+                "id": 16,
+                "name": "ParameterList",
+                "src": "300:15:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 17,
+                "name": "ParameterList",
+                "src": "331:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 18,
+                "name": "Block",
+                "src": "331:206:0"
+              }
+            ],
+            "id": 19,
+            "name": "FunctionDefinition",
+            "src": "284:253:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "withdraw",
+              "scope": 36,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 20,
+                "name": "ParameterList",
+                "src": "558:2:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 21,
+                "name": "ParameterList",
+                "src": "568:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 22,
+                "name": "Block",
+                "src": "568:158:0"
+              }
+            ],
+            "id": 23,
+            "name": "FunctionDefinition",
+            "src": "541:185:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "agree",
+              "scope": 36,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 24,
+                "name": "ParameterList",
+                "src": "744:2:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 25,
+                "name": "ParameterList",
+                "src": "754:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 26,
+                "name": "Block",
+                "src": "754:167:0"
+              }
+            ],
+            "id": 27,
+            "name": "FunctionDefinition",
+            "src": "730:191:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "viewBaskets",
+              "scope": 36,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 28,
+                "name": "ParameterList",
+                "src": "945:2:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 29,
+                "name": "ParameterList",
+                "src": "960:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 30,
+                "name": "Block",
+                "src": "960:151:0"
+              }
+            ],
+            "id": 31,
+            "name": "FunctionDefinition",
+            "src": "925:186:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "swapBaskets",
+              "scope": 36,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 32,
+                "name": "ParameterList",
+                "src": "1135:2:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33,
+                "name": "ParameterList",
+                "src": "1147:0:0"
+              },
+              {
+                "attributes": {
+                  "statements": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 34,
+                "name": "Block",
+                "src": "1147:44:0"
+              }
+            ],
+            "id": 35,
+            "name": "FunctionDefinition",
+            "src": "1115:76:0"
+          }
+        ],
+        "id": 36,
+        "name": "ContractDefinition",
+        "src": "66:1127:0"
+      }
+    ],
+    "id": 37,
+    "name": "SourceUnit",
+    "src": "32:1162:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
+  },
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0x5F3976c085FC2404407a4e70027B9097fE094f2d",
+      "transactionHash": "0x9c982d874cc9d09af7a9ba55143ff983748e00258f9eca2a1bee4282d16c9c89"
+    }
+  },
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2021-11-01T16:27:30.820Z",
+  "networkType": "ethereum",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
