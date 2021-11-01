@@ -2,13 +2,15 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Escrow {
-  constructor(address owner1, address owner2) public {
-    // make baskets for 2 parties
-  }
 
   modifier isBasketOwner() {
     // check if msg.sende owns one of the baskest
     _;
+  }
+
+  function createBaskets(address owner1, address owner2) public {
+    // make baskets for 2 parties
+
   }
 
   function deposit(address token) public payable {
