@@ -65,7 +65,10 @@ contract Escrow {
 
   function viewState() public view 
   returns (address owner1, address owner2, bool agree1, bool agree2){
-    //
+    owner1 = _states[msg.sender].owner1;
+    owner2 = _states[msg.sender].owner2;
+    agree1 = _states[msg.sender].agreed1;
+    agree2 = _states[msg.sender].agreed2;
   }
 
   function _swapBaskets() internal {
