@@ -3,14 +3,39 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract Escrow {
 
+  struct NftData {
+    address tokenAddress; 
+    uint256 tokenIDd; 
+  }
+
+  struct State {
+    address owner1;
+    address owner2;
+    NftData[] basket1;  // where is it stored?
+    NftData[] basket2;
+    bool agreed1;
+    bool agreed2; 
+  }
+
+  mapping(address => State) private _states;
+
+  event createdBasket();
+
   modifier isBasketOwner() {
     // check if msg.sende owns one of the baskest
     _;
   }
 
   function createBaskets(address owner1, address owner2) public {
-    // make baskets for 2 parties
+    require(_states[owner1].owner1 == address(0),
+    "Owner1 has already a basket.");
+    require(_states[owner2].owner1 == address(0),
+    "Owner2 has already a basket.");
+    _states[owner1].owner1 = owner1;
+    _states[owner1].owner2 = owner2;
+    _states[owner2] = _states[owner1];
 
+    emit createdBasket();
   }
 
   function deposit(address token) public payable {
@@ -38,7 +63,18 @@ contract Escrow {
     // show content of both baskets (in a nice way)
   }
 
-  function swapBaskets() internal {
+  function viewState() public view 
+  returns (address owner1, address owner2, bool agree1, bool agree2){
+    //
+  }
+
+  function _swapBaskets() internal {
     // swap routine, internal function
+  }
+
+  function _getNFT(NftData memory nftData) internal {
+    //ck_contract = w3.eth.contract(address=w3.toChecksumAddress(ck_token_addr)
+    // ABI missing? 
+    // return what?
   }
 }
