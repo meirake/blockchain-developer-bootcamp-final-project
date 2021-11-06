@@ -56,6 +56,7 @@ contract("Escrow", function (accounts) {
     it("cannot create 2nd baskets", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
       await catchRevert(testee.createBaskets(ron, harry, {from: ron}));
+      await catchRevert(testee.createBaskets(harry, ron, {from: harry}));
     });
   });
 });
