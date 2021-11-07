@@ -8,35 +8,29 @@ contract Escrow {
     uint256 tokenID; 
   }
 
-  struct State {
-    address owner1;
-    address owner2;
-    bool agreed1;
-    bool agreed2; 
-  }
-
-  mapping(address => State) private _states;
+  mapping(address => address) private _partner;
   mapping(address => NftData[]) private _baskets;
+  mapping(address => bool) private _agreed;
 
   event createdBasket();
   event successfulDeposit(
     address indexed owner,
     address indexed tokenAddress,
     uint256 indexed tokenID);
+  event setAgreed(address indexed owner);
 
   modifier isBasketOwner() {
-    require(_states[msg.sender].owner1 != address(0));
+    require(_partner[msg.sender] != address(0));
     _;
   }
 
   function createBaskets(address owner1, address owner2) public {
-    require(_states[owner1].owner1 == address(0),
+    require(_partner[owner1] == address(0),
     "Owner1 has already a basket.");
-    require(_states[owner2].owner1 == address(0),
+    require(_partner[owner2] == address(0),
     "Owner2 has already a basket.");
-    _states[owner1].owner1 = owner1;
-    _states[owner1].owner2 = owner2;
-    _states[owner2] = _states[owner1];
+    _partner[owner1] = owner2;
+    _partner[owner2] = owner1;
 
     emit createdBasket();
   }
@@ -47,9 +41,10 @@ contract Escrow {
   {
     // check if token is tranfer to Escrow was successful?
     // make contract owner of token -> React app will do?!
-    _states[msg.sender].agreed1 = false;
-    _states[msg.sender].agreed2 = false;
-    require(!_states[msg.sender].agreed1 && !_states[msg.sender].agreed2);
+    _agreed[msg.sender] = false;
+    _agreed[_partner[msg.sender]] = false;
+    require(!_agreed[msg.sender] && !_agreed[_partner[msg.sender]], 
+    "Invalidating previous Agreements failed.");
     _baskets[msg.sender].push(NftData({
       tokenAddress: tokenAddress,
       tokenID: tokenID
@@ -61,13 +56,18 @@ contract Escrow {
     // check if msg.sender owns one of the baskets
     // if yes, invalidate previous agreements and
     // return all tokens that are in senders basket
+    _agreed[msg.sender] = false;
+    _agreed[_partner[msg.sender]] = false;
   }
 
-  function agree() public {
-    // check if msg.sender owns one of the baskets
-    // log agreement
+  function agree() public 
+  isBasketOwner() 
+  {
     // if both basket owners are currently agreeing:
     // -> start basket swap routine 
+    _agreed[msg.sender] = true;
+
+    emit setAgreed(msg.sender);
   }
 
   function viewBaskets() public view {
@@ -77,10 +77,17 @@ contract Escrow {
 
   function viewState() public view 
   returns (address owner1, address owner2, bool agree1, bool agree2){
-    owner1 = _states[msg.sender].owner1;
-    owner2 = _states[msg.sender].owner2;
-    agree1 = _states[msg.sender].agreed1;
-    agree2 = _states[msg.sender].agreed2;
+    if (_partner[msg.sender] == address(0)) {
+      owner1 = address(0);
+      owner2 = address(0);
+      agree1 = false;
+      agree2 = false;
+    } else {
+      owner1 = msg.sender;
+      owner2 = _partner[msg.sender];
+      agree1 = _agreed[msg.sender];
+      agree2 = _agreed[owner2];
+    }
   }
 
   function _swapBaskets() internal {
