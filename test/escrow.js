@@ -11,8 +11,10 @@ contract("Escrow", function (accounts) {
   const [_owner, harry, ron, draco] = accounts;
 
   const emptyAddress = "0x0000000000000000000000000000000000000000";
-  let nftAddress = "0x0000000000000000000000000000000000000001";
-  let nftIndex = 0;
+  const nftAddress = "0x0000000000000000000000000000000000000001";
+  const defaultTokenID = 0;
+  const nftIndex = 371;
+  const nftIndex2 = 567;
 
   let testee;
 
@@ -55,15 +57,15 @@ contract("Escrow", function (accounts) {
   describe("Deposit", () => {
     it("Correct deposition for existing basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const txH = await testee.deposit(nftAddress, nftIndex++, {from: harry});
+      const txH = await testee.deposit(nftAddress, nftIndex, {from: harry});
       assert.equal(txH.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Harry");
-      const txR = await testee.deposit(nftAddress, nftIndex++, {from: ron});
+      const txR = await testee.deposit(nftAddress, nftIndex, {from: ron});
       assert.equal(txR.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Ron");
     });
     it("Cannot deposit without basket", async () => {
-      await catchRevert(testee.deposit(nftAddress, nftIndex++, {from: harry}));
+      await catchRevert(testee.deposit(nftAddress, nftIndex, {from: harry}));
     });
   });
 
@@ -84,7 +86,7 @@ contract("Escrow", function (accounts) {
         await testee.agree({from: harry});
         const agreeBefore = await testee.viewState.call({from: ron});
         assert.isTrue(agreeBefore[3], "Agree2 (Harry) is not True.");
-        await testee.deposit(nftAddress, nftIndex++, {from: account});
+        await testee.deposit(nftAddress, nftIndex, {from: account});
         const agreeAfter = await testee.viewState.call({from: ron});
         assert.isFalse(agreeAfter[3], "Agree2 (Harry) is not False.");
       }
@@ -100,5 +102,44 @@ contract("Escrow", function (accounts) {
         assert.isFalse(agreeAfter[2], "Agree1 (Harry) is not False.");
       }
     })
+  });
+
+  describe("View Baskets", () => {
+    beforeEach(async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      for (let i = 0; i < 3; ++i){
+        await testee.deposit(nftAddress, nftIndex, {from: harry});
+      }
+      for (let i = 0; i < 2; ++i){
+        await testee.deposit(nftAddress, nftIndex2, {from: ron});
+      }
+    });
+
+    it("View own basket, valid index", async () => {
+      const result = await testee.viewMyBasket(0, {from: harry});
+      assert.equal(result[0], nftAddress, "Returned wrong address.");
+      assert.equal(result[1], nftIndex, "Returned wrong Index");
+    });
+    it("View own basket, invalid index", async () => {
+      const result = await testee.viewMyBasket(71, {from: harry});
+      assert.equal(result[0], emptyAddress, "Returned wrong address.");
+      assert.equal(result[1], defaultTokenID, "Returned wrong Index");
+    });
+    it("View partner basket, valid index", async () => {
+      const result = await testee.viewPartnerBasket(0, {from: harry});
+      assert.equal(result[0], nftAddress, "Returned wrong address.");
+      assert.equal(result[1], nftIndex2, "Returned wrong Index");
+    });
+    it("View partner basket, invalid index", async () => {
+      const result = await testee.viewPartnerBasket(71, {from: harry});
+      assert.equal(result[0], emptyAddress, "Returned wrong address.");
+      assert.equal(result[1], defaultTokenID, "Returned wrong Index");
+    });
+    it("Has no basket, view own basket", async () => {
+      await catchRevert(testee.viewMyBasket(1, {from: draco}));
+    });
+    it("Has no basket, view partner basket", async () => {
+      await catchRevert(testee.viewPartnerBasket(1, {from: draco}));
+    });
   });
 });
