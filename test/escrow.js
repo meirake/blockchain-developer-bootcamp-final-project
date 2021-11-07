@@ -9,9 +9,10 @@ let { catchRevert } = require("./exceptionsHelpers.js");
  */
 contract("Escrow", function (accounts) {
   const nrNfts = 10;
+  let nftIndex = 0;
   const [_owner, harry, ron, draco] = accounts;
-  var harrysNfts = [];
-  var ronsNfts = [];
+  let harrysNfts = [];
+  let ronsNfts = [];
 
   const emptyAddress = "0x0000000000000000000000000000000000000000";
 
@@ -38,6 +39,7 @@ contract("Escrow", function (accounts) {
 
   beforeEach(async () => {
     testee = await Escrow.new();
+    assert.isTrue(nftIndex < nrNfts, "Increase number of available NFTs.")
   });
 
   describe("Test Preparation", () => {
@@ -81,6 +83,22 @@ contract("Escrow", function (accounts) {
       assert.equal(result[1], emptyAddress, "Owner2 is not 0x0.");
       assert.isFalse(result[2], "Agree1 is not False.");
       assert.isFalse(result[3], "Agree2 is not False.")
+    });
+  });
+
+  describe("Deposit", () => {
+    it("Correct deposition for existing basket", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const txH = await testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry});
+      assert.equal(txH.logs[0].event, "successfulDeposit", 
+      "Expected successfullDeposit Event for Harry");
+      const txR = await testee.deposit(nftAddress, ronsNfts[nftIndex], {from: ron});
+      assert.equal(txR.logs[0].event, "successfulDeposit", 
+      "Expected successfullDeposit Event for Ron");
+      nftIndex++;
+    });
+    it("Cannot deposit without basket", async () => {
+      catchRevert(testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry}));
     });
   });
 });
