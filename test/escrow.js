@@ -67,14 +67,11 @@ contract("Escrow", function (accounts) {
   describe("View State", () => {
     it("Get correct data for existing State", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const stateHarry = await testee.viewState.call({from: harry});
-      const stateRon = await testee.viewState.call({from: ron});
-      [stateHarry, stateRon].forEach((result) => {
-        assert.equal(result[0], harry, "Owner1 is not harry.");
-        assert.equal(result[1], ron, "Owner2 is not Ron.");
-        assert.isFalse(result[2], "Agree1 is not False.");
-        assert.isFalse(result[3], "Agree2 is not False.")
-      });
+      const result = await testee.viewState.call({from: harry});
+      assert.equal(result[0], harry, "Owner1 is not harry.");
+      assert.equal(result[1], ron, "Owner2 is not Ron.");
+      assert.isFalse(result[2], "Agree1 is not False.");
+      assert.isFalse(result[3], "Agree2 is not False.");
     });
     it("Get empty state for caller without basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
@@ -98,7 +95,39 @@ contract("Escrow", function (accounts) {
       nftIndex++;
     });
     it("Cannot deposit without basket", async () => {
-      catchRevert(testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry}));
+      await catchRevert(testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry}));
     });
+  });
+
+  describe("Agree", () => {
+    it("Proper use of agree", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const tx = await testee.agree({from: ron});
+      const result = await testee.viewState.call({from: ron});
+      assert.isTrue(result[2], "Agree1 is not true (Ron's agreement).");
+      assert.equal(tx.logs[0].event, "setAgreed");
+    });
+    it("Agree without basket fails", async () => {
+      await catchRevert(testee.agree({from: draco}));
+    }) 
+    it("Invalidate agreement after deposit", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      await testee.agree({from: harry});
+      const agreeBefore = await testee.viewState.call({from: ron});
+      assert.isTrue(agreeBefore[3], "Agree2 (Harry) is not True.");
+      await testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry});
+      const agreeAfter = await testee.viewState.call({from: ron});
+      assert.isFalse(agreeAfter[3], "Agree2 (Harry) is not False.");
+      nftIndex++;
+    })
+    it("Invalidate agreement after withdraw", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      await testee.agree({from: harry});
+      const agreeBefore = await testee.viewState.call({from: harry});
+      assert.isTrue(agreeBefore[2], "Agree1 (Harry) is not True.");
+      await testee.withdraw({from: ron});
+      const agreeAfter = await testee.viewState.call({from: harry});
+      assert.isFalse(agreeAfter[2], "Agree1 (Harry) is not False.");
+    })
   });
 });
