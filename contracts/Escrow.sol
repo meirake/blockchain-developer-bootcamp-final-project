@@ -5,24 +5,27 @@ contract Escrow {
 
   struct NftData {
     address tokenAddress; 
-    uint256 tokenIDd; 
+    uint256 tokenID; 
   }
 
   struct State {
     address owner1;
     address owner2;
-    NftData[] basket1;  // where is it stored?
-    NftData[] basket2;
     bool agreed1;
     bool agreed2; 
   }
 
   mapping(address => State) private _states;
+  mapping(address => NftData[]) private _baskets;
 
   event createdBasket();
+  event successfulDeposit(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 indexed tokenID);
 
   modifier isBasketOwner() {
-    // check if msg.sende owns one of the baskest
+    require(_states[msg.sender].owner1 != address(0));
     _;
   }
 
@@ -38,11 +41,20 @@ contract Escrow {
     emit createdBasket();
   }
 
-  function deposit(address token) public payable {
-    // check if msg.sender owns one of the baskets
-    // check if token is actually owned by sender?
-    // if yes, invalidate previous agreements and
-    // transfer token to the coresponding basket
+  function deposit(address tokenAddress, uint256 tokenID) 
+  public 
+  isBasketOwner()
+  {
+    // check if token is tranfer to Escrow was successful?
+    // make contract owner of token -> React app will do?!
+    _states[msg.sender].agreed1 = false;
+    _states[msg.sender].agreed2 = false;
+    require(!_states[msg.sender].agreed1 && !_states[msg.sender].agreed2);
+    _baskets[msg.sender].push(NftData({
+      tokenAddress: tokenAddress,
+      tokenID: tokenID
+    }));
+    emit successfulDeposit(msg.sender, tokenAddress, tokenID);
   }
 
   function withdraw() public {
@@ -73,6 +85,7 @@ contract Escrow {
 
   function _swapBaskets() internal {
     // swap routine, internal function
+    // make opposite owner to token owner
   }
 
   function _getNFT(NftData memory nftData) internal {
