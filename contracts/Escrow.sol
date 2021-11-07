@@ -70,10 +70,30 @@ contract Escrow {
     emit setAgreed(msg.sender);
   }
 
-  function viewBaskets() public view {
-    // check if msg sender is one of the owner? (useless, every body can view internal state)
-    // show content of both baskets (in a nice way)
+  function viewMyBasket(uint item) public view 
+  isBasketOwner()
+  returns (address tokenAddress, uint256 tokenID) 
+  {
+    return _viewBasketFromAddress(msg.sender, item);
   }
+
+  function viewPartnerBasket(uint item) public view 
+  isBasketOwner()
+  returns (address tokenAddress, uint256 tokenID) 
+  {
+    return _viewBasketFromAddress(_partner[msg.sender], item);
+  }
+
+  function _viewBasketFromAddress(address addr, uint item) internal view
+  returns (address tokenAddress, uint256 tokenID) 
+  {
+    if (item < _baskets[addr].length) {
+      tokenAddress = _baskets[addr][item].tokenAddress;
+      tokenID = _baskets[addr][item].tokenID;
+    } else {
+      tokenAddress = address(0);
+      tokenID = 0;
+    }}
 
   function viewState() public view 
   returns (address owner1, address owner2, bool agree1, bool agree2){
@@ -93,11 +113,5 @@ contract Escrow {
   function _swapBaskets() internal {
     // swap routine, internal function
     // make opposite owner to token owner
-  }
-
-  function _getNFT(NftData memory nftData) internal {
-    //ck_contract = w3.eth.contract(address=w3.toChecksumAddress(ck_token_addr)
-    // ABI missing? 
-    // return what?
   }
 }
