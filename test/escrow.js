@@ -8,47 +8,16 @@ let { catchRevert } = require("./exceptionsHelpers.js");
  * See docs: https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
  */
 contract("Escrow", function (accounts) {
-  const nrNfts = 10;
-  let nftIndex = 0;
   const [_owner, harry, ron, draco] = accounts;
-  let harrysNfts = [];
-  let ronsNfts = [];
 
   const emptyAddress = "0x0000000000000000000000000000000000000000";
-
-  let NFTs;
-  let nftAddress;
+  let nftAddress = "0x0000000000000000000000000000000000000001";
+  let nftIndex = 0;
 
   let testee;
 
-  before(async () => {
-    NFTs = await TestNFTs.deployed();
-    nftAddress = NFTs.address;
-
-    for (let i = 0; i < nrNfts; ++i) {
-      await NFTs.mintTestNFT({from: harry});
-      const harrysNft = await NFTs.getLastTokenID.call();
-      harrysNfts.push(harrysNft.toNumber());
-
-      await NFTs.mintTestNFT({from: ron});
-      const ronsNft = await NFTs.getLastTokenID.call();
-      ronsNfts.push(ronsNft.toNumber());
-    }
-    // console.log(ronsNfts);
-  });
-
   beforeEach(async () => {
     testee = await Escrow.new();
-    assert.isTrue(nftIndex < nrNfts, "Increase number of available NFTs.")
-  });
-
-  describe("Test Preparation", () => {
-    it("Each participant has correct number of NFTs", async () => {
-      assert.equal(harrysNfts.length, nrNfts, 
-        "Didn't mint correctly for Harry.");
-      assert.equal(ronsNfts.length, nrNfts, 
-        "Didn't mint correctly for Ron.");
-    });
   });
 
   describe("Create Baskets", () => {
@@ -86,16 +55,15 @@ contract("Escrow", function (accounts) {
   describe("Deposit", () => {
     it("Correct deposition for existing basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const txH = await testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry});
+      const txH = await testee.deposit(nftAddress, nftIndex++, {from: harry});
       assert.equal(txH.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Harry");
-      const txR = await testee.deposit(nftAddress, ronsNfts[nftIndex], {from: ron});
+      const txR = await testee.deposit(nftAddress, nftIndex++, {from: ron});
       assert.equal(txR.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Ron");
-      nftIndex++;
     });
     it("Cannot deposit without basket", async () => {
-      await catchRevert(testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry}));
+      await catchRevert(testee.deposit(nftAddress, nftIndex++, {from: harry}));
     });
   });
 
@@ -112,22 +80,25 @@ contract("Escrow", function (accounts) {
     }) 
     it("Invalidate agreement after deposit", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      await testee.agree({from: harry});
-      const agreeBefore = await testee.viewState.call({from: ron});
-      assert.isTrue(agreeBefore[3], "Agree2 (Harry) is not True.");
-      await testee.deposit(nftAddress, harrysNfts[nftIndex], {from: harry});
-      const agreeAfter = await testee.viewState.call({from: ron});
-      assert.isFalse(agreeAfter[3], "Agree2 (Harry) is not False.");
-      nftIndex++;
+      for (const account of [harry, ron]) {
+        await testee.agree({from: harry});
+        const agreeBefore = await testee.viewState.call({from: ron});
+        assert.isTrue(agreeBefore[3], "Agree2 (Harry) is not True.");
+        await testee.deposit(nftAddress, nftIndex++, {from: account});
+        const agreeAfter = await testee.viewState.call({from: ron});
+        assert.isFalse(agreeAfter[3], "Agree2 (Harry) is not False.");
+      }
     })
     it("Invalidate agreement after withdraw", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      await testee.agree({from: harry});
-      const agreeBefore = await testee.viewState.call({from: harry});
-      assert.isTrue(agreeBefore[2], "Agree1 (Harry) is not True.");
-      await testee.withdraw({from: ron});
-      const agreeAfter = await testee.viewState.call({from: harry});
-      assert.isFalse(agreeAfter[2], "Agree1 (Harry) is not False.");
+      for (const account of [harry, ron]) {
+        await testee.agree({from: harry});
+        const agreeBefore = await testee.viewState.call({from: harry});
+        assert.isTrue(agreeBefore[2], "Agree1 (Harry) is not True.");
+        await testee.withdraw({from: account});
+        const agreeAfter = await testee.viewState.call({from: harry});
+        assert.isFalse(agreeAfter[2], "Agree1 (Harry) is not False.");
+      }
     })
   });
 });
