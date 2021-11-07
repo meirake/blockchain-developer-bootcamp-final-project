@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-contract Escrow {
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+
+contract Escrow is ERC721Holder {
 
   struct NftData {
     address tokenAddress; 
@@ -39,8 +42,18 @@ contract Escrow {
   public 
   isBasketOwner()
   {
-    // check if token is tranfer to Escrow was successful?
-    // make contract owner of token -> React app will do?!
+    ERC721 erc271 = ERC721(tokenAddress);
+    require(erc271.ownerOf(tokenID) == msg.sender, 
+    "Caller is not Onwer of specified token.");
+
+    require(erc271.getApproved(tokenID) == address(this), 
+    "Escrow is not approved for specified token.");
+
+    erc271.safeTransferFrom(msg.sender, address(this), tokenID);
+
+    require(erc271.ownerOf(tokenID) == address(this),
+    "Failed to transfer token to Escrow Contract.");
+
     _agreed[msg.sender] = false;
     _agreed[_partner[msg.sender]] = false;
     require(!_agreed[msg.sender] && !_agreed[_partner[msg.sender]], 

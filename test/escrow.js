@@ -13,12 +13,6 @@ contract("Escrow", function (accounts) {
   const emptyAddress = "0x0000000000000000000000000000000000000000";
 
   const defaultTokenID = 0;
-  
-  const nrNfts = 30;
-  let harrysNftInd = 0;
-  let ronsNftInd = 0;
-  var harrysNfts = [];
-  var ronsNfts = [];
   let NFTs;
   let nftAddress;
 
@@ -27,30 +21,34 @@ contract("Escrow", function (accounts) {
   before(async () => {
     NFTs = await TestNFTs.deployed();
     nftAddress = NFTs.address;
+  });
 
-    for (let i = 0; i < nrNfts; ++i) {
+  async function getNftHarry() {
       await NFTs.mintTestNFT({from: harry});
       const harrysNft = await NFTs.getLastTokenID.call();
-      harrysNfts.push(harrysNft.toNumber());
+      return harrysNft.toNumber();
+  }
 
+  async function getNftHarryApproved() {
+    const tokenID = await getNftHarry();
+    await NFTs.approve(testee.address, tokenID, {from: harry});
+    return tokenID;
+  }
+
+  async function getNftRon() {
       await NFTs.mintTestNFT({from: ron});
-      const ronsNft = await NFTs.getLastTokenID.call();
-      ronsNfts.push(ronsNft.toNumber());
-    }
-    // console.log(ronsNfts);
-  });
+      const harrysNft = await NFTs.getLastTokenID.call();
+      return harrysNft.toNumber();
+  }
+
+  async function getNftRonApproved() {
+    const tokenID = await getNftRon();
+    await NFTs.approve(testee.address, tokenID, {from: ron});
+    return tokenID;
+  }
 
   beforeEach(async () => {
     testee = await Escrow.new();
-  });
-
-  describe("Test Preparation", () => {
-    it("Each participant has correct number of NFTs", async () => {
-      assert.equal(harrysNfts.length, nrNfts, 
-        "Didn't mint correctly for Harry.");
-      assert.equal(ronsNfts.length, nrNfts, 
-        "Didn't mint correctly for Ron.");
-    });
   });
 
   describe("Create Baskets", () => {
@@ -88,15 +86,34 @@ contract("Escrow", function (accounts) {
   describe("Deposit", () => {
     it("Correct deposition for existing basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const txH = await testee.deposit(nftAddress, harrysNfts[harrysNftInd++], {from: harry});
+      const hTokenID = await getNftHarryApproved();
+      const txH = await testee.deposit(nftAddress, hTokenID, {from: harry});
       assert.equal(txH.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Harry");
-      const txR = await testee.deposit(nftAddress, ronsNfts[ronsNftInd++], {from: ron});
+      const rTokenID = await getNftRonApproved();
+      const txR = await testee.deposit(nftAddress, rTokenID, {from: ron});
       assert.equal(txR.logs[0].event, "successfulDeposit", 
       "Expected successfullDeposit Event for Ron");
+      const harryTokenOwner = await NFTs.ownerOf(hTokenID);
+      assert.equal(harryTokenOwner, testee.address, 
+        "Token is not property of Escrow contract (Harry).");
+      const ronTokenOwner = await NFTs.ownerOf(rTokenID);
+      assert.equal(ronTokenOwner, testee.address, 
+        "Token is not property of Escrow contract (Ron).")
     });
     it("Cannot deposit without basket", async () => {
-      await catchRevert(testee.deposit(nftAddress, harrysNfts[harrysNftInd++], {from: harry}));
+      const tokenID = await getNftHarryApproved();
+      await catchRevert(testee.deposit(nftAddress, tokenID, {from: harry}));
+    });
+    it("Cannot deposit NFT that is not mine", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const tokenID = await getNftHarryApproved();
+      await catchRevert(testee.deposit(nftAddress, tokenID, {from: ron}));
+    });
+    it("Cannot deposit NFT that is not approved", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const tokenID = await getNftHarry();
+      await catchRevert(testee.deposit(nftAddress, tokenID, {from: harry}));
     });
   });
 
@@ -116,9 +133,9 @@ contract("Escrow", function (accounts) {
       for (const account of [harry, ron]) {
         let tokenID;
         if (account == harry) {
-          tokenID = harrysNfts[harrysNftInd++];
+          tokenID = await getNftHarryApproved();
         } else {
-          tokenID = ronsNfts[ronsNftInd++];
+          tokenID = await getNftRonApproved();
         }
         await testee.agree({from: harry});
         const agreeBefore = await testee.viewState.call({from: ron});
@@ -144,7 +161,7 @@ contract("Escrow", function (accounts) {
   describe("View Baskets", () => {
     it("View own basket, valid index", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const tokenID = harrysNfts[harrysNftInd++];
+      const tokenID = await getNftHarryApproved();
       await testee.deposit(nftAddress, tokenID, {from: harry});
       const result = await testee.viewMyBasket(0, {from: harry});
       assert.equal(result[0], nftAddress, "Returned wrong address.");
@@ -158,7 +175,7 @@ contract("Escrow", function (accounts) {
     });
     it("View partner basket, valid index", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const tokenID = ronsNfts[ronsNftInd++];
+      const tokenID = await getNftRonApproved();
       await testee.deposit(nftAddress, tokenID, {from: ron});
       const result = await testee.viewPartnerBasket(0, {from: harry});
       assert.equal(result[0], nftAddress, "Returned wrong address.");
