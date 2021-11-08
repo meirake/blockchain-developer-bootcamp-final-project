@@ -229,4 +229,47 @@ contract("Escrow", function (accounts) {
       await catchRevert(testee.cancel({from: draco}));
     });
   });
+
+  describe("Swap tokens", () => {
+    it("Both agree and automatic token swap", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const hTokenID1 = await getNftHarryApproved();
+      await testee.deposit(nftAddress, hTokenID1, {from: harry});
+      const hTokenID2 = await getNftHarryApproved();
+      await testee.deposit(nftAddress, hTokenID2, {from: harry});
+      const rTokenID = await getNftRonApproved();
+      await testee.deposit(nftAddress, rTokenID, {from: ron});
+
+      await testee.agree({from: harry});
+
+      const ownerHToken1Before = await NFTs.ownerOf(hTokenID1);
+      const ownerHToken2Before = await NFTs.ownerOf(hTokenID2);
+      const ownerRTokenBefore= await NFTs.ownerOf(rTokenID);
+
+      assert.equal(ownerHToken1Before, testee.address, 
+        "Harrys 1st token is not owned by Escrow contract.");
+      assert.equal(ownerHToken2Before, testee.address, 
+        "Harrys 2nd token is not owned by Escrow contract.");
+      assert.equal(ownerRTokenBefore, testee.address, 
+        "Rons token is not owned by Escrow contract.");
+
+      await testee.agree({from: ron});
+
+      const ownerHToken1After = await NFTs.ownerOf(hTokenID1);
+      const ownerHToken2After = await NFTs.ownerOf(hTokenID2);
+      const ownerRTokenAfter = await NFTs.ownerOf(rTokenID);
+
+      assert.equal(ownerHToken1After, ron, 
+        "Harrys 1st token was not transfered to Ron.");
+      assert.equal(ownerHToken2After, ron, 
+        "Harrys 2nd token was not transfered to Ron.");
+      assert.equal(ownerRTokenAfter, harry, 
+        "Rons token was not transfered to Harry.");
+      await catchRevert(testee.viewMyBasket.call(0, {from: harry}), 
+        "Harry shouldn't have a basket after token swap.");
+      await catchRevert(testee.viewMyBasket.call(0, {from: ron}), 
+        "Ron shouldn't have a basket after token swap.");
+      
+    });
+  });
 });
