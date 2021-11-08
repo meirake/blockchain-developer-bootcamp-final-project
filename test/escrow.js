@@ -163,13 +163,13 @@ contract("Escrow", function (accounts) {
       await testee.createBaskets(harry, ron, {from: harry});
       const tokenID = await getNftHarryApproved();
       await testee.deposit(nftAddress, tokenID, {from: harry});
-      const result = await testee.viewMyBasket(0, {from: harry});
+      const result = await testee.viewMyBasket.call(0, {from: harry});
       assert.equal(result[0], nftAddress, "Returned wrong address.");
       assert.equal(result[1], tokenID, "Returned wrong Index");
     });
     it("View own basket, invalid index", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const result = await testee.viewMyBasket(71, {from: harry});
+      const result = await testee.viewMyBasket.call(71, {from: harry});
       assert.equal(result[0], emptyAddress, "Returned wrong address.");
       assert.equal(result[1], defaultTokenID, "Returned wrong Index");
     });
@@ -177,23 +177,23 @@ contract("Escrow", function (accounts) {
       await testee.createBaskets(harry, ron, {from: harry});
       const tokenID = await getNftRonApproved();
       await testee.deposit(nftAddress, tokenID, {from: ron});
-      const result = await testee.viewPartnerBasket(0, {from: harry});
+      const result = await testee.viewPartnerBasket.call(0, {from: harry});
       assert.equal(result[0], nftAddress, "Returned wrong address.");
       assert.equal(result[1], tokenID, "Returned wrong Index");
     });
     it("View partner basket, invalid index", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      const result = await testee.viewPartnerBasket(71, {from: harry});
+      const result = await testee.viewPartnerBasket.call(71, {from: harry});
       assert.equal(result[0], emptyAddress, "Returned wrong address.");
       assert.equal(result[1], defaultTokenID, "Returned wrong Index");
     });
     it("Has no basket, view own basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      await catchRevert(testee.viewMyBasket(1, {from: draco}));
+      await catchRevert(testee.viewMyBasket.call(1, {from: draco}));
     });
     it("Has no basket, view partner basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
-      await catchRevert(testee.viewPartnerBasket(1, {from: draco}));
+      await catchRevert(testee.viewPartnerBasket.call(1, {from: draco}));
     });
   });
 });
