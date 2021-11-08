@@ -81,11 +81,15 @@ contract Escrow is ERC721Holder {
   function agree() public 
   isBasketOwner() 
   {
-    // if both basket owners are currently agreeing:
-    // -> start basket swap routine 
     _agreed[msg.sender] = true;
-    // TODO call function to transfer tokens
     emit setAgreed(msg.sender);
+    address partner = _partner[msg.sender];
+    if (_agreed[partner]) {
+      _transferAllTokens(msg.sender, partner);
+      _transferAllTokens(partner, msg.sender);
+      _clearFor(msg.sender);
+      _clearFor(partner);
+    }
   }
 
   function viewMyBasket(uint item) public view 
