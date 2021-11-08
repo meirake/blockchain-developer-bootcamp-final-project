@@ -11,6 +11,7 @@ contract Escrow is ERC721Holder {
     uint256 tokenID; 
   }
 
+  NftData[] private emptyNftDataArray;
   mapping(address => address) private _partner;
   mapping(address => NftData[]) private _baskets;
   mapping(address => bool) private _agreed;
@@ -21,6 +22,7 @@ contract Escrow is ERC721Holder {
     address indexed tokenAddress,
     uint256 indexed tokenID);
   event setAgreed(address indexed owner);
+  event successfulCancel(address indexed caller, address indexed partner);
 
   modifier isBasketOwner() {
     require(_partner[msg.sender] != address(0));
@@ -64,13 +66,16 @@ contract Escrow is ERC721Holder {
     }));
     emit successfulDeposit(msg.sender, tokenAddress, tokenID);
   }
-
-  function withdraw() public {
-    // check if msg.sender owns one of the baskets
-    // if yes, invalidate previous agreements and
-    // return all tokens that are in senders basket
-    _agreed[msg.sender] = false;
-    _agreed[_partner[msg.sender]] = false;
+  
+  function cancel() public 
+  isBasketOwner()
+  {
+    address partner = _partner[msg.sender];
+    _transferAllTokens(msg.sender, msg.sender);
+    _transferAllTokens(partner, partner);
+    _clearFor(msg.sender);
+    _clearFor(partner);
+    emit successfulCancel(msg.sender, partner);
   }
 
   function agree() public 
@@ -79,7 +84,7 @@ contract Escrow is ERC721Holder {
     // if both basket owners are currently agreeing:
     // -> start basket swap routine 
     _agreed[msg.sender] = true;
-
+    // TODO call function to transfer tokens
     emit setAgreed(msg.sender);
   }
 
@@ -95,6 +100,14 @@ contract Escrow is ERC721Holder {
   returns (address tokenAddress, uint256 tokenID) 
   {
     return _viewBasketFromAddress(_partner[msg.sender], item);
+  }
+
+  function viewNumberOfDepositedTokens() public view 
+  isBasketOwner()
+  returns (uint nrTokensCaller, uint nrTokensParter) 
+  {
+    nrTokensCaller = _baskets[msg.sender].length;
+    nrTokensParter = _baskets[_partner[msg.sender]].length;
   }
 
   function _viewBasketFromAddress(address addr, uint item) internal view
@@ -123,8 +136,26 @@ contract Escrow is ERC721Holder {
     }
   }
 
-  function _swapBaskets() internal {
-    // swap routine, internal function
-    // make opposite owner to token owner
+  function _transferAllTokens(address toAddress, address basketAddress) 
+  internal 
+  {
+    for (uint i = 0; i < _baskets[basketAddress].length; ++i) {
+      address tokenAddress = _baskets[basketAddress][i].tokenAddress;
+      uint256 tokenID = _baskets[basketAddress][i].tokenID;
+      ERC721 erc271 = ERC721(tokenAddress);
+      require(erc271.ownerOf(tokenID) == address(this), 
+      "Contract is not Onwer of specified token.");
+      erc271.safeTransferFrom(address(this), toAddress, tokenID);
+      require(erc271.ownerOf(tokenID) == toAddress,
+      "Failed to transfer token to Escrow Contract.");
+    }
+  }
+
+  function _clearFor(address addr) 
+  internal 
+  {
+    _baskets[addr] = emptyNftDataArray;
+    _partner[addr] = address(0);
+    _agreed[addr] = false;
   }
 }
