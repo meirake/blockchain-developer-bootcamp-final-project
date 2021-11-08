@@ -145,17 +145,6 @@ contract("Escrow", function (accounts) {
         assert.isFalse(agreeAfter[3], "Agree2 (Harry) is not False.");
       }
     })
-    it("Invalidate agreement after withdraw", async () => {
-      await testee.createBaskets(harry, ron, {from: harry});
-      for (const account of [harry, ron]) {
-        await testee.agree({from: harry});
-        const agreeBefore = await testee.viewState.call({from: harry});
-        assert.isTrue(agreeBefore[2], "Agree1 (Harry) is not True.");
-        await testee.withdraw({from: account});
-        const agreeAfter = await testee.viewState.call({from: harry});
-        assert.isFalse(agreeAfter[2], "Agree1 (Harry) is not False.");
-      }
-    })
   });
 
   describe("View Baskets", () => {
@@ -194,6 +183,50 @@ contract("Escrow", function (accounts) {
     it("Has no basket, view partner basket", async () => {
       await testee.createBaskets(harry, ron, {from: harry});
       await catchRevert(testee.viewPartnerBasket.call(1, {from: draco}));
+    });
+    it("Check number of tokens in basket", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const tokenID = await getNftRonApproved();
+      await testee.deposit(nftAddress, tokenID, {from: ron});
+      const nrTokens = await testee.viewNumberOfDepositedTokens.call({from: harry});
+      assert.equal(nrTokens[0], 0, "Harry shouldn't have any deposited tokens.");
+      assert.equal(nrTokens[1], 1, "Ron should have on depostied token.");
+    });
+  });
+
+  describe("Cancel", () => {
+    it("Proper Canceling", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const hTokenID = await getNftHarryApproved();
+      await testee.deposit(nftAddress, hTokenID, {from: harry});
+      const rTokenID = await getNftRonApproved();
+      await testee.deposit(nftAddress, rTokenID, {from: ron});
+      const tx = await testee.cancel({from: ron});
+      const hTokenOwner = await NFTs.ownerOf(hTokenID);
+      assert.equal(hTokenOwner, harry, "Harry didn't get back his token.");
+      const rTokenOwner = await NFTs.ownerOf(rTokenID);
+      assert.equal(rTokenOwner, ron, "Ron dind't get back his token.");
+      assert(tx.logs[0].event, "successfulCancel");
+      await catchRevert(testee.viewMyBasket.call(0, {from: harry}), 
+      "Harry shouldn't have a basket after canceling.");
+      await catchRevert(testee.viewMyBasket.call(0, {from: ron}), 
+      "Ron shouldn't have a basket after canceling.");
+
+      const stateNoBasket = await testee.viewState.call({from: harry});
+      assert.equal(stateNoBasket[0], emptyAddress, "Owner1 should be 0x0.");
+      assert.equal(stateNoBasket[1], emptyAddress, "Owner2 should be 0x0.");
+
+      await testee.createBaskets(harry, ron, {from: harry});
+      const stateWithBasket = await testee.viewState.call({from: harry});
+      assert.isFalse(stateWithBasket[2], "Agreed1 should be False.");
+      assert.isFalse(stateWithBasket[3], "Agreed2 should be False.");
+      const nrTokens = await testee.viewNumberOfDepositedTokens.call({from: harry});
+      assert.equal(nrTokens[0], 0, "Harrys basket is not empyt.");
+      assert.equal(nrTokens[1], 0, "Rons basket is not empty.")
+    });
+    it("Canceling without having a basket", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      await catchRevert(testee.cancel({from: draco}));
     });
   });
 });
