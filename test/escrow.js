@@ -64,6 +64,20 @@ contract("Escrow", function (accounts) {
     });
   });
 
+  describe("Check if address has basket", () => {
+    it("has no basket", async () => {
+      const hasBasket = await testee.hasBasket.call({from: harry});
+      assert.isFalse(hasBasket, "Returned True although Harry has no basket.")
+    });
+    it("has basket", async () => {
+      await testee.createBaskets(harry, ron, {from: harry});
+      const hasBasketH = await testee.hasBasket.call({from: harry});
+      assert.isTrue(hasBasketH, "Returned False although Harry has a basket.")
+      const hasBasketR = await testee.hasBasket.call({from: ron});
+      assert.isTrue(hasBasketR, "Returned False although Ron has a basket.")
+    });
+  });
+
   describe("View State", () => {
     it("Get correct data for existing State", async () => {
       await testee.createBaskets(harry, ron, {from: harry});

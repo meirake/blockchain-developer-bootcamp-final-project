@@ -25,8 +25,13 @@ contract Escrow is ERC721Holder {
   event successfulCancel(address indexed caller, address indexed partner);
 
   modifier isBasketOwner() {
-    require(_partner[msg.sender] != address(0));
+    //require(_partner[msg.sender] != address(0));
+    require(hasBasket());
     _;
+  }
+
+  function hasBasket() public view returns (bool) {
+    return (_partner[msg.sender] != address(0));
   }
 
   function createBaskets(address owner1, address owner2) public {
