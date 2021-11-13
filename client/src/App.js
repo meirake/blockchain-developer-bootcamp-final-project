@@ -10,8 +10,7 @@ class App extends Component {
     accounts: null, 
     contract: null,
     hasBasket: false,
-    owner1: "",
-    owner2: ""
+    account: "",
   };
 
   componentDidMount = async () => {
@@ -33,7 +32,7 @@ class App extends Component {
         web3: web3, 
         accounts: accounts, 
         contract: instance, 
-        owner1: accounts[0] 
+        account: accounts[0] 
       });
       await this.updateHasBasket();
     } catch (error) {
@@ -47,13 +46,13 @@ class App extends Component {
 
   async updateHasBasket() {
     const hasBasket = await this.state.contract.methods.hasBasket().call(
-      {from: this.state.accounts[0]});
+      {from: this.state.account});
     this.setState({hasBasket: hasBasket});
   }
 
-  async makeBaskets() {
+  async makeBaskets(partner) {
     await this.state.contract.methods.createBaskets(
-      this.state.owner1, this.state.owner2).send({ from: this.state.owner1 }
+      this.state.account, partner).send({ from: this.state.account }
     );
     await this.updateHasBasket();
     console.log("Made baskets.")
@@ -68,13 +67,28 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <h1>Escrow</h1>
+        <h1>Create a transaction</h1>
+        <CreateTransaction
+          onClick={(partner) => this.makeBaskets(partner)}
+        />
+      </div>
+    );
+  }
+}
+class CreateTransaction extends Component {
+  state = {
+    partner: ""
+  };
+
+  render(){
+    return(
+      <div>
         <input 
-          value={this.state.owner2}
+          value={this.state.partner}
           type="text" 
-          onChange={(e)=>{this.setState({owner2: e.target.value})}}
+          onChange={(e)=>{this.setState({partner: e.target.value})}}
         /> 
-        <button onClick ={() => this.makeBaskets()}>Make baskets</button>
+        <button onClick={() => this.props.onClick(this.state.partner)}>Make baskets</button>
       </div>
     );
   }
