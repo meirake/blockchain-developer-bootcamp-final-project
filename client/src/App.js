@@ -84,7 +84,26 @@ class App extends Component {
   }
 
   async deposit(tokenAddr, tokenId) {
-    console.log("deposit called");
+    // TODO: doesn't catch contract require statements properly.
+    await this.updateHasBasket();
+    if (!this.state.hasBasket) {
+      return;
+    }
+    try {
+      await this.state.contract.methods.deposit(
+        tokenAddr, tokenId).send({from: this.state.account});
+      this.updateBasketContents();
+    }
+    catch (error) {
+      console.log(error);
+      const msg = (error + 
+        "\n\n Please make sure that: \n" +
+        "- the NFT address is valid \n" +
+        "- the token ID is correct \n" +
+        "- you are the owner of this token \n" +
+        "- you approved the Escrow contract for this token\n");
+      alert(msg);
+    }
   }
 
   render() {
@@ -100,6 +119,9 @@ class App extends Component {
             pBasket = {this.state.partnersBasket}
             onClick={() => this.updateBasketContents()} 
           />
+          <Deposit 
+            onClick={(addr, id) => this.deposit(addr, id)}
+          />
         </div>
       );
     }
@@ -109,6 +131,45 @@ class App extends Component {
         <CreateTransaction
           onClick={(partner) => this.makeBaskets(partner)}
         />
+      </div>
+    );
+  }
+}
+
+class Deposit extends Component {
+  state ={
+    tokenAddress: "",
+    tokenId: 0
+  };
+
+  render(){
+    const emptyAddr = "0x0000000000000000000000000000000000000000";
+    return(
+      <div className="Group">
+        <h2>Deposit an NFT</h2>
+        <div>
+          <label className="deposit"> Address: </label>
+          <input 
+            className="deposit"
+            placeholder = {emptyAddr}
+            value={this.state.tokenAddress}
+            type="text" 
+            onChange={(e)=>{this.setState({tokenAddress: e.target.value})}}
+          /> 
+        </div>
+        <div>
+          <label className="deposit"> ID: </label> 
+          <input 
+            className="deposit"
+            placeholder = {emptyAddr}
+            value={this.state.tokenId}
+            type="number" 
+            onChange={(e)=>{this.setState({tokenId: e.target.value})}}
+          /> 
+        </div>
+        <div>
+          <button onClick={() => this.props.onClick(this.state.tokenAddress, this.state.tokenId)}>Deposit</button>
+        </div>
       </div>
     );
   }
