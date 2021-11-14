@@ -83,6 +83,10 @@ class App extends Component {
     console.log("Made baskets.")
   }
 
+  async deposit(tokenAddr, tokenId) {
+    console.log("deposit called");
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -128,12 +132,7 @@ class ViewBaskets extends Component {
 
   render(){
     return(
-      <div>
-        <div>
-          <button onClick={() => this.props.onClick()}>
-            UpdateBaskets
-          </button>
-        </div>
+      <div className="Group">
         <div className="row">
           <div className = "col">
             <h2>My Basket</h2>
@@ -148,6 +147,9 @@ class ViewBaskets extends Component {
             </ul>
           </div>
         </div>
+          <button onClick={() => this.props.onClick()}>
+            UpdateBaskets
+          </button>
       </div>
     );
   }
