@@ -4,6 +4,8 @@ import getWeb3 from "./getWeb3";
 
 import "./App.css";
 
+
+const emptyAddr = "0x0000000000000000000000000000000000000000";
 class App extends Component {
   state = {
     web3: null, 
@@ -143,7 +145,6 @@ class Deposit extends Component {
   };
 
   render(){
-    const emptyAddr = "0x0000000000000000000000000000000000000000";
     return(
       <div className="Group">
         <h2>Deposit an NFT</h2>
@@ -223,7 +224,8 @@ class CreateTransaction extends Component {
   render(){
     return(
       <div>
-        <input 
+        <input className="address"
+          placeholder={emptyAddr}
           value={this.state.partner}
           type="text" 
           onChange={(e)=>{this.setState({partner: e.target.value})}}

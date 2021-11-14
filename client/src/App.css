@@ -46,8 +46,15 @@ ul.basket {
   margin: 20px
 }
 
-input.deposit {
+input.address, input.deposit {
   width: 28em;
+}
+
+input.address {
+  margin-right: 5px;
+}
+
+input.deposit {
   margin-bottom: 10px;
   margin-left: 1em;
 }
