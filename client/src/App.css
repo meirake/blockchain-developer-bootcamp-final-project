@@ -20,3 +20,21 @@
 .App-link {
   color: #09d3ac;
 }
+
+ul.basket {
+  list-style-type: none;
+  text-align: left;
+  border-radius: 10px;
+  padding: 5px 15px 5px 15px;
+  margin: 0;
+  background-color: #b3dae9;
+}
+
+.row {
+  display: flex;
+}
+
+.col {
+  flex: 1;
+  padding: 5px;
+}
