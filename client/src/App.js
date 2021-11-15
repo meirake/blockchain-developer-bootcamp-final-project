@@ -14,7 +14,9 @@ class App extends Component {
     hasBasket: false,
     account: "",
     myBasket: [],
-    partnersBasket: []
+    partnersBasket: [],
+    myAgree: false,
+    partnerAgree: false
   };
 
   componentDidMount = async () => {
@@ -40,6 +42,7 @@ class App extends Component {
       });
       await this.updateHasBasket();
       await this.updateBasketContents();
+      await this.updateAgreed();
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -77,6 +80,50 @@ class App extends Component {
     console.log(this.state.partnersBasket);
   }
 
+  async updateAgreed() {
+    await this.updateHasBasket();
+    if (!this.state.hasBasket) {
+      return;
+    }
+    const agreement = await this.state.contract.methods.viewState().call(
+      {from: this.state.account}
+    );
+    this.setState({
+      myAgree: agreement.agree1, 
+      partnerAgree: agreement.agree2
+    });
+  }
+
+  async updateAll() {
+    await this.updateHasBasket();
+    await this.updateAgreed();
+    await this.updateBasketContents();
+  }
+
+  async onAgree() {
+    await this.updateHasBasket();
+    if (!this.state.hasBasket) {
+      return;
+    }
+    await this.state.contract.methods.agree().send(
+      {from: this.state.account}
+    );
+    console.log("Agreed");
+    await this.updateAgreed();
+  }
+
+  async onCancel() {
+    await this.updateHasBasket();
+    if (!this.state.hasBasket) {
+      return;
+    }
+    await this.state.contract.methods.cancel().send(
+      {from: this.state.account}
+    );
+    console.log("Canceled");
+    await this.updateHasBasket();
+  }
+
   async makeBaskets(partner) {
     await this.state.contract.methods.createBaskets(
       this.state.account, partner).send({ from: this.state.account }
@@ -87,7 +134,7 @@ class App extends Component {
 
   async deposit(tokenAddr, tokenId) {
     // TODO: doesn't catch contract require statements properly.
-    await this.updateHasBasket();
+    await this.updateAll();
     if (!this.state.hasBasket) {
       return;
     }
@@ -116,14 +163,33 @@ class App extends Component {
       return (
         <div className="App">
           <h1>Your open transaction</h1>
+        <button className="update"
+          onClick={() => this.updateAll()}>
+          Update
+        </button>
           <ViewBaskets 
             myBasket = {this.state.myBasket}
             pBasket = {this.state.partnersBasket}
-            onClick={() => this.updateBasketContents()} 
           />
-          <Deposit 
-            onClick={(addr, id) => this.deposit(addr, id)}
-          />
+          <div className="row">
+            <div className="col">
+              <Deposit 
+                onClick={(addr, id) => this.deposit(addr, id)}
+              />
+            </div>
+            <div className="col">
+              <Status
+                myAgree = {this.state.myAgree}
+                pAgree = {this.state.partnerAgree}
+              />
+            </div>
+            <div className="col">
+              <Actions
+                onAgree={() => this.onAgree()}
+                onCancel={() => this.onCancel()}
+              />
+            </div>
+          </div>
         </div>
       );
     }
@@ -138,6 +204,30 @@ class App extends Component {
   }
 }
 
+class Actions extends Component {
+
+  render() {
+    return(
+      <div className="GroupActions">
+        <h2>Actions</h2>
+        <div>
+        <button className="actions"
+          onClick={() => this.props.onAgree()}>
+          Agree
+        </button>
+        </div>
+        <div>
+        <button  className="actions"
+          onClick={() => this.props.onCancel()}>
+          Cancel
+        </button>
+        </div>
+
+      </div>);
+  }
+
+}
+
 class Deposit extends Component {
   state ={
     tokenAddress: "",
@@ -146,7 +236,7 @@ class Deposit extends Component {
 
   render(){
     return(
-      <div className="Group">
+      <div className="GroupDeposit">
         <h2>Deposit an NFT</h2>
         <div>
           <label className="deposit"> Address: </label>
@@ -176,6 +266,37 @@ class Deposit extends Component {
   }
 }
 
+class Status extends Component {
+  getColor(agreed) {
+    if (agreed) {
+      return "green";
+    }
+    return "red";
+  }
+
+  getText(agreed) {
+    if (agreed) {
+      return "agreed.";
+    }
+    return "did not agree.";
+  }
+
+  render() {
+    return(
+      <div className="GroupMiddle">
+        <h2>Status</h2>
+        <p className={this.getColor(this.props.myAgree)}>
+          <b>{"You " + this.getText(this.props.myAgree)}</b>
+        </p>
+        <p className={this.getColor(this.props.pAgree)}>
+          <b>{"Your partner " + this.getText(this.props.pAgree)}</b>
+        </p>
+
+      </div>);
+  }
+
+}
+
 class ViewBaskets extends Component {
   basketElements(basket) {
     const tokens = basket.map((token, index) => {
@@ -196,22 +317,19 @@ class ViewBaskets extends Component {
     return(
       <div className="Group">
         <div className="row">
-          <div className = "col">
+          <div className = "colInside">
             <h2>My Basket</h2>
             <ul className ="basket">
               {this.basketElements(this.props.myBasket)}
             </ul>
           </div>
-          <div className = "col">
+          <div className = "colInside">
             <h2>Partner Basket</h2>
             <ul className ="basket">
               {this.basketElements(this.props.pBasket)}
             </ul>
           </div>
         </div>
-          <button onClick={() => this.props.onClick()}>
-            UpdateBaskets
-          </button>
       </div>
     );
   }

@@ -30,21 +30,50 @@ ul.basket {
   background-color: #b3dae9;
 }
 
+p.red, p.green {
+  text-align: center;
+}
+
+p.red {
+  color: #ce0000;
+}
+
+p.green {
+  color: #00812b;
+}
+
 .row {
   display: flex;
 }
 
-.col {
+.col, .colInside {
   flex: 1;
+}
+
+.colInside {
   padding: 5px;
 }
 
-.Group {
+.Group, .GroupDeposit, .GroupActions, .GroupMiddle {
   border: 1px solid;
   border-radius: 10px;
   padding: 15px 15px 15px 15px;
-  margin: 20px
-}
+  margin: 0px 20px 10px 20px;
+  min-width: max-content;
+ }
+
+ .GroupDeposit {
+   margin-right: 5px;
+ }
+
+ .GroupActions {
+   margin-left: 5px;
+ }
+
+ .GroupMiddle {
+   margin-left: 5px;
+   margin-right: 5px;
+ }
 
 input.address, input.deposit {
   width: 28em;
@@ -63,4 +92,8 @@ label.deposit {
   display: inline-block;
   width: 4em;
   text-align: right;
+}
+
+button.actions, button.update {
+  margin-bottom: 10px;
 }
