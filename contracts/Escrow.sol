@@ -4,6 +4,9 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
+/// @title Escrow contract to exchange ERC721 NFTs
+/// @author Mareike Kuehn
+/// @notice Safely exchange a set of ERC721 NFTs with a partner. 
 contract Escrow is ERC721Holder {
 
   struct NftData {
@@ -30,10 +33,16 @@ contract Escrow is ERC721Holder {
     _;
   }
 
+  /// @notice Check if caller already has a basket to exchange NFTs
+  /// @dev Using msg.sender for check (not tx.origin)
+  /// @return True, if the function caller already has a basket, else False
   function hasBasket() public view returns (bool) {
     return (_partner[msg.sender] != address(0));
   }
 
+  /// @notice Create baskets for two addresses to exchange NFTs
+  /// @param owner1 Address of participant 1
+  /// @param owner2 Address of participant 2
   function createBaskets(address owner1, address owner2) public {
     require(_partner[owner1] == address(0),
     "Owner1 has already a basket.");
@@ -45,6 +54,9 @@ contract Escrow is ERC721Holder {
     emit createdBasket();
   }
 
+  /// @notice Deposit an NFT (ERC721) in callers basket. Approve contract for this token before.
+  /// @param tokenAddress Address of contract of token
+  /// @param tokenID ID of the token
   function deposit(address tokenAddress, uint256 tokenID) 
   public 
   isBasketOwner()
@@ -72,6 +84,7 @@ contract Escrow is ERC721Holder {
     emit successfulDeposit(msg.sender, tokenAddress, tokenID);
   }
   
+  /// @notice Cancel this exchange. Will Return all NFTs to previous owners.
   function cancel() public 
   isBasketOwner()
   {
@@ -83,6 +96,7 @@ contract Escrow is ERC721Holder {
     emit successfulCancel(msg.sender, partner);
   }
 
+  /// @notice Agree to exchange tokens. If both user agree, tokens will be transfered to their new owner.
   function agree() public 
   isBasketOwner() 
   {
@@ -97,6 +111,11 @@ contract Escrow is ERC721Holder {
     }
   }
 
+  /// @notice View an item in callers basket
+  /// @dev returns 0 for id and address if item doesn't exist
+  /// @param item index of item to view
+  /// @return tokenAddress Adress of the deposited token 
+  /// @return tokenID ID of the deposited token
   function viewMyBasket(uint item) public view 
   isBasketOwner()
   returns (address tokenAddress, uint256 tokenID) 
@@ -104,6 +123,11 @@ contract Escrow is ERC721Holder {
     return _viewBasketFromAddress(msg.sender, item);
   }
 
+  /// @notice View an item in caller partners basket
+  /// @dev returns 0 for id and address if item doesn't exist
+  /// @param item index of item to view
+  /// @return tokenAddress Adress of the deposited token 
+  /// @return tokenID ID of the deposited token
   function viewPartnerBasket(uint item) public view 
   isBasketOwner()
   returns (address tokenAddress, uint256 tokenID) 
@@ -111,6 +135,9 @@ contract Escrow is ERC721Holder {
     return _viewBasketFromAddress(_partner[msg.sender], item);
   }
 
+  /// @notice Get number of deposited tokens for caller and partner
+  /// @return nrTokensCaller number of tokens the caller deposited 
+  /// @return nrTokensParter number of tokens the callers partner deposited 
   function viewNumberOfDepositedTokens() public view 
   isBasketOwner()
   returns (uint nrTokensCaller, uint nrTokensParter) 
@@ -130,6 +157,11 @@ contract Escrow is ERC721Holder {
       tokenID = 0;
     }}
 
+  /// @notice View the sate of ongoing callers transaction
+  /// @return owner1 address of caller
+  /// @return owner2 address of callers partner
+  /// @return agree1 True, if caller agreed to exchange tokens, else False
+  /// @return agree2 True, if partner agreed to exchange tokens, else False
   function viewState() public view 
   returns (address owner1, address owner2, bool agree1, bool agree2){
     if (_partner[msg.sender] == address(0)) {
