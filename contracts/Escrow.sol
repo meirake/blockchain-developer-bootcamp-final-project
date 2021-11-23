@@ -76,15 +76,16 @@ contract Escrow is ERC721Holder {
     require(erc271.getApproved(tokenID) == address(this), 
     "Escrow is not approved for specified token.");
 
+    _baskets[msg.sender].push(NftData({
+      tokenAddress: tokenAddress,
+      tokenID: tokenID
+    }));
+
     erc271.safeTransferFrom(msg.sender, address(this), tokenID);
 
     require(erc271.ownerOf(tokenID) == address(this),
     "Failed to transfer token to Escrow Contract.");
 
-    _baskets[msg.sender].push(NftData({
-      tokenAddress: tokenAddress,
-      tokenID: tokenID
-    }));
     emit successfulDeposit(msg.sender, tokenAddress, tokenID);
   }
   
