@@ -61,7 +61,7 @@ contract Escrow is ERC721Holder {
   /// @param tokenID ID of the token
   function deposit(address tokenAddress, uint256 tokenID) 
   public 
-  isBasketOwner()
+  isBasketOwner
   {
     _clearAgrees();
 
@@ -86,7 +86,7 @@ contract Escrow is ERC721Holder {
   
   /// @notice Cancel this exchange. Will Return all NFTs to previous owners.
   function cancel() public 
-  isBasketOwner()
+  isBasketOwner
   {
     address partner = _partner[msg.sender];
     _transferAfterCancel(msg.sender, partner);
@@ -95,7 +95,7 @@ contract Escrow is ERC721Holder {
 
   /// @notice Agree to exchange tokens. If both user agree, tokens will be transfered to their new owner.
   function agree() public 
-  isBasketOwner() 
+  isBasketOwner
   {
     _agreed[msg.sender] = true;
     emit setAgreed(msg.sender);
@@ -111,7 +111,7 @@ contract Escrow is ERC721Holder {
   /// @return tokenAddress Adress of the deposited token 
   /// @return tokenID ID of the deposited token
   function viewMyBasket(uint item) public view 
-  isBasketOwner()
+  isBasketOwner
   returns (address tokenAddress, uint256 tokenID) 
   {
     return _viewBasketFromAddress(msg.sender, item);
@@ -123,7 +123,7 @@ contract Escrow is ERC721Holder {
   /// @return tokenAddress Adress of the deposited token 
   /// @return tokenID ID of the deposited token
   function viewPartnerBasket(uint item) public view 
-  isBasketOwner()
+  isBasketOwner
   returns (address tokenAddress, uint256 tokenID) 
   {
     return _viewBasketFromAddress(_partner[msg.sender], item);
@@ -133,7 +133,7 @@ contract Escrow is ERC721Holder {
   /// @return nrTokensCaller number of tokens the caller deposited 
   /// @return nrTokensParter number of tokens the callers partner deposited 
   function viewNumberOfDepositedTokens() public view 
-  isBasketOwner()
+  isBasketOwner
   returns (uint nrTokensCaller, uint nrTokensParter) 
   {
     nrTokensCaller = _baskets[msg.sender].length;
@@ -182,7 +182,7 @@ contract Escrow is ERC721Holder {
       "Contract is not Onwer of specified token.");
       erc271.safeTransferFrom(address(this), toAddress, tokenID);
       require(erc271.ownerOf(tokenID) == toAddress,
-      "Failed to transfer token to Escrow Contract.");
+      "Failed to transfer token.");
     }
   }
 
