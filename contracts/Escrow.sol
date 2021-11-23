@@ -26,6 +26,10 @@ contract Escrow is ERC721Holder {
     uint256 indexed tokenID);
   event setAgreed(address indexed owner);
   event successfulCancel(address indexed caller, address indexed partner);
+  event escrowIsNotOwner(
+    address indexed tokenOwner,
+    address indexed tokenAddress,
+    uint256 indexed tokenID);
 
   modifier isBasketOwner() {
     //require(_partner[msg.sender] != address(0));
@@ -178,11 +182,14 @@ contract Escrow is ERC721Holder {
       address tokenAddress = _baskets[basketAddress][i].tokenAddress;
       uint256 tokenID = _baskets[basketAddress][i].tokenID;
       ERC721 erc271 = ERC721(tokenAddress);
-      require(erc271.ownerOf(tokenID) == address(this), 
-      "Contract is not Onwer of specified token.");
-      erc271.safeTransferFrom(address(this), toAddress, tokenID);
-      require(erc271.ownerOf(tokenID) == toAddress,
-      "Failed to transfer token.");
+      address tokenOwner = erc271.ownerOf(tokenID);
+      if (tokenOwner == address(this)) {
+        erc271.safeTransferFrom(address(this), toAddress, tokenID);
+        require(erc271.ownerOf(tokenID) == toAddress,
+        "Failed to transfer token.");
+      } else {
+        emit escrowIsNotOwner(tokenOwner, tokenAddress, tokenID);
+      }
     }
   }
 
