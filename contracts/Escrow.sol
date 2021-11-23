@@ -50,6 +50,8 @@ contract Escrow is ERC721Holder {
     "Owner2 has already a basket.");
     _partner[owner1] = owner2;
     _partner[owner2] = owner1;
+    _clearBasketFor(owner1);
+    _clearBasketFor(owner2);
 
     emit createdBasket();
   }
@@ -61,6 +63,8 @@ contract Escrow is ERC721Holder {
   public 
   isBasketOwner()
   {
+    _clearAgrees();
+
     ERC721 erc271 = ERC721(tokenAddress);
     require(erc271.ownerOf(tokenID) == msg.sender, 
     "Caller is not Onwer of specified token.");
@@ -73,10 +77,6 @@ contract Escrow is ERC721Holder {
     require(erc271.ownerOf(tokenID) == address(this),
     "Failed to transfer token to Escrow Contract.");
 
-    _agreed[msg.sender] = false;
-    _agreed[_partner[msg.sender]] = false;
-    require(!_agreed[msg.sender] && !_agreed[_partner[msg.sender]], 
-    "Invalidating previous Agreements failed.");
     _baskets[msg.sender].push(NftData({
       tokenAddress: tokenAddress,
       tokenID: tokenID
@@ -89,10 +89,7 @@ contract Escrow is ERC721Holder {
   isBasketOwner()
   {
     address partner = _partner[msg.sender];
-    _transferAllTokens(msg.sender, msg.sender);
-    _transferAllTokens(partner, partner);
-    _clearFor(msg.sender);
-    _clearFor(partner);
+    _transferAfterCancel(msg.sender, partner);
     emit successfulCancel(msg.sender, partner);
   }
 
@@ -104,10 +101,7 @@ contract Escrow is ERC721Holder {
     emit setAgreed(msg.sender);
     address partner = _partner[msg.sender];
     if (_agreed[partner]) {
-      _transferAllTokens(msg.sender, partner);
-      _transferAllTokens(partner, msg.sender);
-      _clearFor(msg.sender);
-      _clearFor(partner);
+      _transferAfterAgree(msg.sender, partner);
     }
   }
 
@@ -192,11 +186,44 @@ contract Escrow is ERC721Holder {
     }
   }
 
-  function _clearFor(address addr) 
+  function _transferAfterAgree(address caller, address partner) 
+  internal 
+  {
+    _removeBasketOwnerships();
+    _clearAgrees();
+    _transferAllTokens(caller, partner);
+    _transferAllTokens(partner, caller);
+
+  }
+
+  function _transferAfterCancel(address caller, address partner) 
+  internal 
+  {
+    _removeBasketOwnerships();
+    _clearAgrees();
+    _transferAllTokens(caller, caller);
+    _transferAllTokens(partner, partner);
+
+  }
+
+  function _removeBasketOwnerships() internal {
+    address partner = _partner[msg.sender];
+    _partner[msg.sender] = address(0);
+    _partner[partner] = address(0);
+    require(_partner[msg.sender] == address(0), "Failed to remove ownership of partner.");
+    require(_partner[partner] == address(0), "Failed to remove ownership of caller.");
+  }
+
+  function _clearAgrees() internal {
+    _agreed[msg.sender] = false;
+    _agreed[_partner[msg.sender]] = false;
+    require(!_agreed[msg.sender] && !_agreed[_partner[msg.sender]], 
+    "Invalidating previous Agreements failed.");
+  }
+
+  function _clearBasketFor(address addr) 
   internal 
   {
     _baskets[addr] = emptyNftDataArray;
-    _partner[addr] = address(0);
-    _agreed[addr] = false;
   }
 }

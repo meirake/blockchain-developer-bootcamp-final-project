@@ -137,6 +137,7 @@ contract("Escrow", function (accounts) {
       const tx = await testee.agree({from: ron});
       const result = await testee.viewState.call({from: ron});
       assert.isTrue(result[2], "Agree1 is not true (Ron's agreement).");
+      assert.isFalse(result[3], "Agree2 is not false (Harry's agreement).");
       assert.equal(tx.logs[0].event, "setAgreed");
     });
     it("Agree without basket fails", async () => {
