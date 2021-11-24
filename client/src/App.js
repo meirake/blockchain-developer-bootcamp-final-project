@@ -34,6 +34,17 @@ class App extends Component {
         EscrowContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
+
+      // watch events
+      instance.events.successfulDeposit({}, 
+        () => this.updateBasketContents());
+      instance.events.setAgreed({}, 
+        () => this.updateAgreed());
+      instance.events.successfulCancel({}, 
+        () => this.updateHasBasket());
+      instance.events.createdBasket({}, 
+        () => this.updateHasBasket());
+
       this.setState({ 
         web3: web3, 
         accounts: accounts, 
@@ -141,7 +152,7 @@ class App extends Component {
     try {
       await this.state.contract.methods.deposit(
         tokenAddr, tokenId).send({from: this.state.account});
-      this.updateBasketContents();
+      await this.updateBasketContents();
     }
     catch (error) {
       console.log(error);
