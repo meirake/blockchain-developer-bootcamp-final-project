@@ -83,7 +83,6 @@ class App extends Component {
     for(let i = 0; i < nrTokens[0]; ++i) {
       const token = await this.state.contract.methods.viewMyBasket(i).call({from: this.state.account});
       myTokens.push(token);
-      // console.log(token[1]);
     }
     for(let i = 0; i < nrTokens[1]; ++i) {
       const token = await this.state.contract.methods.viewPartnerBasket(i).call({from: this.state.account});
@@ -261,7 +260,6 @@ class Actions extends Component {
 
       </div>);
   }
-
 }
 
 class Deposit extends Component {
@@ -334,10 +332,8 @@ class Status extends Component {
         <p className={this.getColor(this.props.pAgree)}>
           <b>{"Your partner " + this.getText(this.props.pAgree)}</b>
         </p>
-
       </div>);
   }
-
 }
 
 class ViewBaskets extends Component {
