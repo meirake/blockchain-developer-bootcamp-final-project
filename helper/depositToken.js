@@ -11,7 +11,7 @@ module.exports = async function(callback) {
     
     await NFTs.mintTestNFT({from: addr2});
     const id2 = await NFTs.getLastTokenID.call();
-    console.log("addr2: " + id2.toNumber());
+    console.log("NFT ID: " + id2.toNumber());
     console.log("NFT address: " + nftAddress);
 
     await NFTs.approve(escrowAddr, id2, {from: addr2});
