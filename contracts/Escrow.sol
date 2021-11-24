@@ -32,7 +32,6 @@ contract Escrow is ERC721Holder {
     uint256 indexed tokenID);
 
   modifier isBasketOwner() {
-    //require(_partner[msg.sender] != address(0));
     require(hasBasket());
     _;
   }
@@ -145,17 +144,6 @@ contract Escrow is ERC721Holder {
     nrTokensParter = _baskets[_partner[msg.sender]].length;
   }
 
-  function _viewBasketFromAddress(address addr, uint item) internal view
-  returns (address tokenAddress, uint256 tokenID) 
-  {
-    if (item < _baskets[addr].length) {
-      tokenAddress = _baskets[addr][item].tokenAddress;
-      tokenID = _baskets[addr][item].tokenID;
-    } else {
-      tokenAddress = address(0);
-      tokenID = 0;
-    }}
-
   /// @notice View the sate of ongoing callers transaction
   /// @return owner1 address of caller
   /// @return owner2 address of callers partner
@@ -175,6 +163,17 @@ contract Escrow is ERC721Holder {
       agree2 = _agreed[owner2];
     }
   }
+
+  function _viewBasketFromAddress(address addr, uint item) internal view
+  returns (address tokenAddress, uint256 tokenID) 
+  {
+    if (item < _baskets[addr].length) {
+      tokenAddress = _baskets[addr][item].tokenAddress;
+      tokenID = _baskets[addr][item].tokenID;
+    } else {
+      tokenAddress = address(0);
+      tokenID = 0;
+    }}
 
   function _transferAllTokens(address toAddress, address basketAddress) 
   internal 
