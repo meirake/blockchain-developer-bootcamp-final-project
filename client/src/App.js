@@ -39,7 +39,7 @@ class App extends Component {
 
       // watch events
       instance.events.successfulDeposit({}, 
-        () => this.updateBasketContents());
+        () => this.updateAll());
       instance.events.setAgreed({}, 
         () => this.updateAgreed());
       instance.events.successfulCancel({}, 
