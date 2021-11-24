@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import EscrowContract from "./contracts/Escrow.json";
+import ERC721 from "./contracts/ERC721.json";
 import getWeb3 from "./getWeb3";
 
 import "./App.css";
@@ -11,6 +12,7 @@ class App extends Component {
     web3: null, 
     accounts: null, 
     contract: null,
+    contractAddr: "",
     hasBasket: false,
     account: "",
     myBasket: [],
@@ -49,6 +51,7 @@ class App extends Component {
         web3: web3, 
         accounts: accounts, 
         contract: instance, 
+        contractAddr: deployedNetwork.address,
         account: accounts[0] 
       });
       await this.updateHasBasket();
@@ -143,6 +146,27 @@ class App extends Component {
     console.log("Made baskets.")
   }
 
+  async approveToken(tokenAddr, tokenId) {
+    await this.updateAll();
+    if (!this.state.hasBasket) {
+      return;
+    }
+    let erc721 = new this.state.web3.eth.Contract(
+      ERC721.abi,
+      tokenAddr
+    );
+    console.log(this.state.contractAddr);
+    try {
+      await erc721.methods.approve(this.state.contractAddr, tokenId).send(
+        {from: this.state.account}
+      );
+      console.log("Approved token.");
+    } catch (error) {
+      console.log("Failed to approve token: ");
+      console.log(error);
+    }
+  }
+
   async deposit(tokenAddr, tokenId) {
     // TODO: doesn't catch contract require statements properly.
     await this.updateAll();
@@ -185,7 +209,8 @@ class App extends Component {
           <div className="row">
             <div className="col">
               <Deposit 
-                onClick={(addr, id) => this.deposit(addr, id)}
+                onApprove={(addr, id) => this.approveToken(addr, id)}
+                onDeposit={(addr, id) => this.deposit(addr, id)}
               />
             </div>
             <div className="col">
@@ -270,7 +295,14 @@ class Deposit extends Component {
           /> 
         </div>
         <div>
-          <button onClick={() => this.props.onClick(this.state.tokenAddress, this.state.tokenId)}>Deposit</button>
+          <button className="deposit"
+            onClick={() => this.props.onApprove(this.state.tokenAddress, this.state.tokenId)}>
+            Approve
+          </button>
+          <button className="deposit"
+            onClick={() => this.props.onDeposit(this.state.tokenAddress, this.state.tokenId)}>
+            Deposit
+          </button>
         </div>
       </div>
     );

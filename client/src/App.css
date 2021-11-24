@@ -94,6 +94,11 @@ label.deposit {
   text-align: right;
 }
 
+button.deposit {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 button.actions, button.update {
   margin-bottom: 10px;
 }
