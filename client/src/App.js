@@ -89,8 +89,6 @@ class App extends Component {
       pTokens.push(token);
     }
     this.setState({myBasket: myTokens, partnersBasket: pTokens});
-    console.log(this.state.myBasket);
-    console.log(this.state.partnersBasket);
   }
 
   async updateAgreed() {
@@ -154,15 +152,18 @@ class App extends Component {
       ERC721.abi,
       tokenAddr
     );
-    console.log(this.state.contractAddr);
     try {
       await erc721.methods.approve(this.state.contractAddr, tokenId).send(
         {from: this.state.account}
       );
-      console.log("Approved token.");
     } catch (error) {
-      console.log("Failed to approve token: ");
       console.log(error);
+      const msg = (error + 
+        "\n\n Please make sure that: \n" +
+        "- the NFT address is valid \n" +
+        "- the token ID is correct \n" +
+        "- you are the owner of this token \n");
+      alert(msg);
     }
   }
 
