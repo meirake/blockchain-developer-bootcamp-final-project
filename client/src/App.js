@@ -31,6 +31,11 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
+      const isRinkeby = networkId === 4;
+      const isLocal = networkId > 1000;
+      if (!isRinkeby && !isLocal) {
+        alert("Please switch to Rinkeby testnet.")
+      }
       const deployedNetwork = EscrowContract.networks[networkId];
       const instance = new web3.eth.Contract(
         EscrowContract.abi,
