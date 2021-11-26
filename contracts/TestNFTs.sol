@@ -9,8 +9,8 @@ contract TestNFTs is ERC721 {
   constructor() ERC721("TestNFTs", "TestNFT") {}
 
   function mintTestNFT() public {
+    ++tokenID;
     _safeMint(msg.sender, tokenID);
-    tokenID++;
   }
 
   function getLastTokenID() public view returns (uint256) {
