@@ -66,7 +66,7 @@ contract Escrow is ERC721Holder {
   public 
   isBasketOwner
   {
-    _clearAgrees();
+    _clearAgrees(msg.sender, _partner[msg.sender]);
 
     ERC721 erc271 = ERC721(tokenAddress);
     require(erc271.ownerOf(tokenID) == msg.sender, 
@@ -196,8 +196,8 @@ contract Escrow is ERC721Holder {
   function _transferAfterAgree(address caller, address partner) 
   internal 
   {
+    _clearAgrees(caller, partner);
     _removeBasketOwnerships();
-    _clearAgrees();
     _transferAllTokens(caller, partner);
     _transferAllTokens(partner, caller);
 
@@ -206,8 +206,8 @@ contract Escrow is ERC721Holder {
   function _transferAfterCancel(address caller, address partner) 
   internal 
   {
+    _clearAgrees(caller, partner);
     _removeBasketOwnerships();
-    _clearAgrees();
     _transferAllTokens(caller, caller);
     _transferAllTokens(partner, partner);
 
@@ -221,10 +221,10 @@ contract Escrow is ERC721Holder {
     require(_partner[partner] == address(0), "Failed to remove ownership of caller.");
   }
 
-  function _clearAgrees() internal {
-    _agreed[msg.sender] = false;
-    _agreed[_partner[msg.sender]] = false;
-    require(!_agreed[msg.sender] && !_agreed[_partner[msg.sender]], 
+  function _clearAgrees(address caller, address partner) internal {
+    _agreed[caller] = false;
+    _agreed[partner] = false;
+    require(!_agreed[caller] && !_agreed[partner], 
     "Invalidating previous Agreements failed.");
   }
 
