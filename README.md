@@ -57,6 +57,10 @@ Access frontend via `localhost:3000`. Make sure you have deployed the contracts 
 
 https://meirake.github.io/blockchain-developer-bootcamp-final-project/
 
+## Screencast
+
+`Screencast.mov` is in the root of this repository. 
+
 ## Possible improvements
 
 - Allow users to participate in more than one ongoing transaction.
