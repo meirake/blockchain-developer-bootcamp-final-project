@@ -57,6 +57,10 @@ Access frontend via `localhost:3000`. Make sure you have deployed the contracts 
 
 https://meirake.github.io/blockchain-developer-bootcamp-final-project/
 
+## Get a Test NFT on Rinkeby
+
+https://rinkeby.etherscan.io/address/0xD09642cd95003c67fFD47AFC5dF36754E7c5f330#writeContract
+
 ## Screencast
 
 `Screencast.mov` is in the root of this repository. 
