@@ -15,6 +15,6 @@ contract TestNFTs is ERC721 {
 
   function getLastTokenID() public view returns (uint256) {
     require(tokenID > 0, "Nothing minted, yet.");
-    return tokenID - 1;
+    return tokenID;
   }
 }
