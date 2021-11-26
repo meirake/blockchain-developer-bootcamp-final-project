@@ -50,7 +50,7 @@ class App extends Component {
       instance.events.successfulCancel({}, 
         () => this.updateHasBasket());
       instance.events.createdBasket({}, 
-        () => this.updateHasBasket());
+        () => this.updateAll());
 
       this.setState({ 
         web3: web3, 
