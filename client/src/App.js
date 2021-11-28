@@ -387,7 +387,7 @@ class CreateTransaction extends Component {
   render(){
     return(
       <div>
-        <p>To start an transaction enter the address of the account you want to exchange NFTs with.</p>
+        <p>To start a transaction enter the address of the account you want to exchange NFTs with.</p>
         <input className="address"
           placeholder={emptyAddr}
           value={this.state.partner}
